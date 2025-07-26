@@ -47,7 +47,7 @@ const Navbar: React.FC = () => {
 
   const NavLinks = () => (
     <>
-      <Link to="/marketplace" className="btn-ghost">
+      <Link to="/listings/" className="btn-ghost">
         <Search className="h-4 w-4 mr-2" />
         {!isMobile && "Browse"}
       </Link>
@@ -161,7 +161,7 @@ const Navbar: React.FC = () => {
               <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/auth/login')}
                   size={isMobile ? "sm" : "default"}
                 >
                   Login

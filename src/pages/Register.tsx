@@ -54,7 +54,7 @@ const Register: React.FC = () => {
         description: "Please login with your credentials",
       });
       
-      navigate('/login');
+      navigate('/auth/login');
     } catch (error: any) {
       toast({
         title: "Registration failed",
@@ -183,7 +183,7 @@ const Register: React.FC = () => {
             <div className="text-center text-sm">
               <span className="text-muted-foreground">Already have an account? </span>
               <Link 
-                to="/login" 
+                to="/auth/login" 
                 className="text-primary hover:underline font-medium"
               >
                 Sign in

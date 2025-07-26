@@ -57,20 +57,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuthStatus();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (account: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await api.post('/login', { email, password });
-      const { access_token, user: userData } = response.data;
-      
+
+      const response = await api.post('/auth/login', { account, password });
+      const { access_token } = response.data;
+
       localStorage.setItem('auth_token', access_token);
-      setUser(userData);
-      
+
+      // 👇 Fetch user data after login
+      const userRes = await api.get('/users/me');
+      setUser(userRes.data);
+
       toast({
         title: "Welcome back!",
-        description: `Hello ${userData.name}, you're now logged in.`,
+        description: `Hello ${userRes.data.name}, you're now logged in.`,
       });
-      
+
       return true;
     } catch (error: any) {
       toast({
@@ -86,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async (): Promise<void> => {
     try {
-      await api.post('/logout');
+      await api.post('/auth/logout');
     } catch (error) {
       // Logout endpoint might not be available, continue anyway
     }

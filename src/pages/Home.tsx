@@ -91,7 +91,7 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center text-white">
             <Badge className="mb-6 bg-accent-mint text-primary" variant="secondary">
-              🚀 Exclusively for SRM Students
+              🛍️ Exclusively for SRM Students
             </Badge>
             
             <h1 className="text-4xl md:text-6xl font-bold mb-6 animate-slide-up">
@@ -110,7 +110,7 @@ const Home: React.FC = () => {
               {isAuthenticated ? (
                 <>
                   <Button
-                    onClick={() => navigate('/marketplace')}
+                    onClick={() => navigate('/listings/')}
                     size="lg"
                     className="bg-accent-mint text-primary hover:bg-accent-mint-dark font-semibold px-8"
                   >
@@ -138,10 +138,10 @@ const Home: React.FC = () => {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Button>
                   <Button
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate('/auth/login')}
                     variant="outline"
                     size="lg"
-                    className="border-white text-white hover:bg-white hover:text-primary"
+                    className="border-white text-black hover:bg-white hover:text-primary"
                   >
                     Sign In
                   </Button>
@@ -216,7 +216,7 @@ const Home: React.FC = () => {
               </p>
             </div>
             <Button 
-              onClick={() => navigate('/marketplace')}
+              onClick={() => navigate('/listings/')}
               className="btn-primary mt-4 md:mt-0"
             >
               View All

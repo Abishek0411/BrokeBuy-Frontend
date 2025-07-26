@@ -24,7 +24,7 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <h3 className="font-semibold">Quick Links</h3>
             <div className="flex flex-col space-y-2 text-sm">
-              <Link to="/marketplace" className="text-muted-foreground hover:text-foreground transition-colors">
+              <Link to="/listings/" className="text-muted-foreground hover:text-foreground transition-colors">
                 Browse Marketplace
               </Link>
               <Link to="/sell" className="text-muted-foreground hover:text-foreground transition-colors">

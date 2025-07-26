@@ -46,7 +46,7 @@ const Marketplace: React.FC = () => {
 
   const fetchListings = async () => {
     try {
-      const response = await api.get('/listings');
+      const response = await api.get('/listings/');
       setListings(response.data);
     } catch (error) {
       toast({

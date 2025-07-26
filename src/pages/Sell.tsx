@@ -70,7 +70,7 @@ const Sell: React.FC = () => {
         submitData.append(`image_${index}`, image);
       });
 
-      await api.post('/listings', submitData, {
+      await api.post('/listings/', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
