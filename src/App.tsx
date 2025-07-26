@@ -9,6 +9,14 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import LoadingScreen from "@/components/LoadingScreen";
 import Index from "./pages/Index";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Marketplace from "./pages/Marketplace";
+import Profile from "./pages/Profile";
+import Wallet from "./pages/Wallet";
+import Sell from "./pages/Sell";
+import MyListings from "./pages/MyListings";
+import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -41,6 +49,14 @@ const App = () => {
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/marketplace" element={<Marketplace />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/wallet" element={<Wallet />} />
+                  <Route path="/sell" element={<Sell />} />
+                  <Route path="/my-listings" element={<MyListings />} />
+                  <Route path="/messages" element={<Messages />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
