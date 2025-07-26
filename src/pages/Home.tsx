@@ -121,7 +121,7 @@ const Home: React.FC = () => {
                     onClick={() => navigate('/sell')}
                     variant="outline"
                     size="lg"
-                    className="border-white text-white hover:bg-white hover:text-primary"
+                    className="border-white text-black hover:bg-white hover:text-primary"
                   >
                     Start Selling
                     <ArrowRight className="ml-2 h-5 w-5" />

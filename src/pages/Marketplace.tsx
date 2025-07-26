@@ -16,13 +16,13 @@ interface Listing {
   category: string;
   condition: string;
   images: string[];
-  seller: {
-    name: string;
-    reg_no: string;
+  seller?: {
+    name?: string;
+    reg_no?: string;
   };
-  location: string;
-  created_at: string;
-  is_available: boolean;
+  location?: string;
+  created_at?: string;
+  is_available?: boolean;
 }
 
 const Marketplace: React.FC = () => {
@@ -215,7 +215,7 @@ const Marketplace: React.FC = () => {
                   <Badge variant="outline">{listing.category}</Badge>
                 </div>
                 <div className="mt-2 text-sm text-muted-foreground">
-                  Sold by {listing.seller.name} ({listing.seller.reg_no})
+                  Sold by {listing.seller?.name || 'Unknown'} ({listing.seller?.reg_no || 'N/A'})
                 </div>
               </CardContent>
               

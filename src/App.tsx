@@ -55,7 +55,7 @@ const App = () => {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/wallet" element={<Wallet />} />
                   <Route path="/sell" element={<Sell />} />
-                  <Route path="/my-listings" element={<MyListings />} />
+                  <Route path="/listings/my-listings" element={<MyListings />} />
                   <Route path="/messages" element={<Messages />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />

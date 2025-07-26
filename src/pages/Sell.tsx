@@ -81,7 +81,7 @@ const Sell: React.FC = () => {
         description: "Your item has been listed successfully",
       });
 
-      navigate('/my-listings');
+      navigate('/listings/my-listings');
     } catch (error: any) {
       toast({
         title: "Error creating listing",

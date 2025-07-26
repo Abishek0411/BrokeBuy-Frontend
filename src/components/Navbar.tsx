@@ -134,7 +134,7 @@ const Navbar: React.FC = () => {
                       Profile
                     </DropdownMenuItem>
                     
-                    <DropdownMenuItem onClick={() => navigate('/my-listings')}>
+                    <DropdownMenuItem onClick={() => navigate('/listings/my-listings')}>
                       <Package className="h-4 w-4 mr-2" />
                       My Listings
                     </DropdownMenuItem>
