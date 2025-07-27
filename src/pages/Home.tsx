@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import api from '@/lib/axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -17,6 +18,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import heroBackground from '@/assets/hero-bg.png';
+import { useToast } from '@/hooks/use-toast';
 
 const Home: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -53,29 +55,40 @@ const Home: React.FC = () => {
     { number: "4.8", label: "Average Rating" },
   ];
 
-  const recentListings = [
-    {
-      title: "iPhone 13 Pro",
-      price: "₹45,000",
-      image: "https://images.unsplash.com/photo-1592750475338-74b7b21085ab?w=300&h=300&fit=crop",
-      category: "Electronics",
-      seller: "Rahul K.",
-    },
-    {
-      title: "Calculus Textbook",
-      price: "₹800",
-      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop",
-      category: "Books",
-      seller: "Priya S.",
-    },
-    {
-      title: "Gaming Chair",
-      price: "₹12,000",
-      image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=300&h=300&fit=crop",
-      category: "Furniture",
-      seller: "Arjun M.",
-    },
-  ];
+  interface Listing {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  category: string;
+  images: string[];  // already optimized URLs
+  created_at: string;
+  is_available: boolean;
+  views: number;
+  interested_users: number;
+  seller_name?: string;
+  seller_reg_no?: string;
+}
+const [recentListings, setRecentListings] = useState<Listing[]>([]);
+const { toast } = useToast();
+
+useEffect(() => {
+  fetchRecentListings();
+}, []);
+
+const fetchRecentListings = async () => {
+  try {
+    const response = await api.get<Listing[]>('/listings/recent');
+    setRecentListings(response.data);
+  } catch (error) {
+    toast({
+      title: "Error loading recent listings",
+      description: "Please try again later.",
+      variant: "destructive",
+    });
+  }
+};
+
 
   return (
     <div className="min-h-screen">
@@ -215,7 +228,7 @@ const Home: React.FC = () => {
                 Fresh items from your SRM community
               </p>
             </div>
-            <Button 
+            <Button
               onClick={() => navigate('/listings/')}
               className="btn-primary mt-4 md:mt-0"
             >
@@ -223,13 +236,15 @@ const Home: React.FC = () => {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
-          
+
+          {/* --- UPDATED GRID LOGIC --- */}
           <div className="grid md:grid-cols-3 gap-6">
             {recentListings.map((item, index) => (
-              <Card key={index} className="glass-card hover-lift cursor-pointer">
+              <Card key={index} className="glass-card hover-lift cursor-pointer" onClick={() => navigate(`/item/${item.id}`)}>
                 <div className="aspect-square overflow-hidden rounded-t-lg">
                   <img
-                    src={item.image}
+                    // Uses the first image from the 'images' array with a fallback
+                    src={item.images?.[0] || "/placeholder.jpg"}
                     alt={item.title}
                     className="w-full h-full object-cover transition-transform hover:scale-105"
                     loading="lazy"
@@ -240,18 +255,22 @@ const Home: React.FC = () => {
                     <CardTitle className="text-lg">{item.title}</CardTitle>
                     <Badge variant="secondary">{item.category}</Badge>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center pt-2">
                     <span className="text-2xl font-bold text-secondary">
-                      {item.price}
+                      {/* Prepends the Rupee symbol to the price */}
+                      ₹{item.price}
                     </span>
                     <span className="text-sm text-muted-foreground">
-                      by {item.seller}
+                      {/* Uses 'seller_name' with a fallback */}
+                      by {item.seller_name || "Unknown"}
                     </span>
                   </div>
                 </CardHeader>
               </Card>
             ))}
           </div>
+          {/* --- END UPDATED GRID LOGIC --- */}
+
         </div>
       </section>
 
