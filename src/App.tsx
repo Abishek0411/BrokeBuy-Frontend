@@ -18,6 +18,13 @@ import Sell from "./pages/Sell";
 import MyListings from "./pages/MyListings";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
+import HowItWorks from "./pages/HowItWorks";
+import SafetyGuidelines from "./pages/SafetyGuidelines";
+import HelpCenter from "./pages/HelpCenter";
+import ReportIssue from "./pages/ReportIssue";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +64,13 @@ const App = () => {
                   <Route path="/sell" element={<Sell />} />
                   <Route path="/listings/my-listings" element={<MyListings />} />
                   <Route path="/messages" element={<Messages />} />
+                  <Route path="/how-it-works" element={<HowItWorks />} />
+                  <Route path="/safety" element={<SafetyGuidelines />} />
+                  <Route path="/help" element={<HelpCenter />} />
+                  <Route path="/report" element={<ReportIssue />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/community-guidelines" element={<CommunityGuidelines />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
