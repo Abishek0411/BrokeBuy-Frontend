@@ -1,21 +1,25 @@
 import React from 'react';
 import { ShoppingCart } from 'lucide-react';
-import loadingCartImage from '@/assets/loading-cart.png';
+// Updated import to use your animated GIF
+import shoppingCartGif from '@/assets/shopping-cart.gif';
 
 const LoadingScreen: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-gradient-hero flex items-center justify-center z-50">
       <div className="text-center">
-        {/* Animated Cart with Image */}
-        <div className="relative mb-8 h-32 overflow-hidden">
+        {/* --- MODIFIED SECTION --- */}
+        {/* Display the animated GIF */}
+        <div className="mb-8 flex justify-center items-center h-32">
           <img 
-            src={loadingCartImage}
-            alt="Loading cart"
-            className="absolute inset-0 w-full h-full object-contain animate-cart-move"
+            src={shoppingCartGif}
+            alt="Loading marketplace animation"
+            // The GIF provides its own animation, so we just control its size
+            className="h-full object-contain"
           />
         </div>
+        {/* --- END MODIFIED SECTION --- */}
         
-        {/* Fallback animated cart icon */}
+        {/* Fallback animated cart icon (This remains as a good fallback) */}
         <div className="mb-6">
           <ShoppingCart className="h-16 w-16 text-accent-mint mx-auto animate-pulse-glow" />
         </div>
@@ -31,7 +35,7 @@ const LoadingScreen: React.FC = () => {
               <div
                 key={i}
                 className="w-2 h-2 bg-accent-mint rounded-full animate-bounce"
-                style={{ animationDelay: `${i * 0.2}s` }}
+                style={{ animationDelay: `${i * 0.1}s` }}
               />
             ))}
           </div>
