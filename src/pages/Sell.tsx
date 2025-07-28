@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { Upload, X, Camera, Package } from 'lucide-react';
 import api from '@/lib/axios';
+import imageCompression from 'browser-image-compression';
 
 const Sell: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -35,17 +36,44 @@ const Sell: React.FC = () => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
+
     if (formData.images.length + files.length > 5) {
       toast({
         title: "Too many images",
-        description: "You can upload maximum 5 images",
+        description: "You can upload a maximum of 5 images",
         variant: "destructive",
       });
       return;
     }
-    setFormData({ ...formData, images: [...formData.images, ...files] });
+
+    const options = {
+      maxSizeMB: 1,                 // 🔧 Target file size
+      maxWidthOrHeight: 1200,       // 📐 Resize for mobile-friendliness
+      useWebWorker: true,           // ⚙️ Perform in background
+    };
+
+    const compressedImages: File[] = [];
+
+    for (const file of files) {
+      try {
+        const compressedFile = await imageCompression(file, options);
+        compressedImages.push(compressedFile);
+      } catch (err) {
+        console.error("Compression failed", err);
+        toast({
+          title: "Compression error",
+          description: "One of the images couldn't be compressed",
+          variant: "destructive",
+        });
+      }
+    }
+
+    setFormData({
+      ...formData,
+      images: [...formData.images, ...compressedImages],
+    });
   };
 
   const removeImage = (index: number) => {
@@ -65,12 +93,13 @@ const Sell: React.FC = () => {
       submitData.append('category', formData.category);
       submitData.append('condition', formData.condition);
       submitData.append('location', formData.location);
-      
-      formData.images.forEach((image, index) => {
-        submitData.append(`image_${index}`, image);
+
+      // ✅ Append each image under the same field name
+      formData.images.forEach((image) => {
+        submitData.append('images', image);
       });
 
-      await api.post('/listings/', submitData, {
+      await api.post('/listings/create', submitData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -92,6 +121,7 @@ const Sell: React.FC = () => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
