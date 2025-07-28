@@ -110,11 +110,13 @@ const MyListings: React.FC = () => {
     <Card className="group hover-card">
       <div className="relative">
         {listing.images.length > 0 ? (
-          <img
-            src={listing.images[0]}
-            alt={listing.title}
-            className="w-full h-48 object-cover rounded-t-lg"
-          />
+          <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg overflow-hidden">
+            <img
+              src={listing.images[0]}
+              alt={listing.title}
+              className="max-h-full max-w-full object-contain"
+            />
+          </div>
         ) : (
           <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg">
             <Package className="h-12 w-12 text-muted-foreground" />

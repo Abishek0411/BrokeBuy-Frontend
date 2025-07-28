@@ -240,7 +240,7 @@ const fetchRecentListings = async () => {
           {/* --- UPDATED GRID LOGIC --- */}
           <div className="grid md:grid-cols-3 gap-6">
             {recentListings.map((item, index) => (
-              <Card key={index} className="glass-card hover-lift cursor-pointer" onClick={() => navigate(`/item/${item.id}`)}>
+              <Card key={index} className="glass-card hover-lift cursor-pointer" onClick={() => navigate(`/listings/${item.id}`)}>
                 <div className="aspect-square overflow-hidden rounded-t-lg">
                   <img
                     // Uses the first image from the 'images' array with a fallback

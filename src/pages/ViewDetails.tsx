@@ -147,8 +147,9 @@ const ViewDetails: React.FC = () => {
       </Button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* --- MODIFIED SECTION --- */}
         {/* Image Carousel */}
-        <div className="space-y-4">
+        <div className="relative"> {/* 1. Added a relative container */}
           {listing.images.length > 0 ? (
             <Carousel className="w-full">
               <CarouselContent>
@@ -156,20 +157,24 @@ const ViewDetails: React.FC = () => {
                   <CarouselItem key={index}>
                     <Card>
                       <CardContent className="p-0">
+                        <div className="w-full max-h-[28rem] flex items-center justify-center overflow-hidden rounded-lg bg-muted">
                         <img
                           src={image}
                           alt={`${listing.title} - Image ${index + 1}`}
-                          className="w-full h-96 object-cover rounded-lg"
+                          className="h-96 w-full object-contain rounded-lg bg-white"
                         />
+                        </div>
                       </CardContent>
                     </Card>
                   </CarouselItem>
                 ))}
               </CarouselContent>
+
+              {/* 2. Explicitly position buttons inside the relative container */}
               {listing.images.length > 1 && (
                 <>
-                  <CarouselPrevious />
-                  <CarouselNext />
+                  <CarouselPrevious className="absolute left-3 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background" />
+                  <CarouselNext className="absolute right-3 top-1/2 -translate-y-1/2 z-10 bg-background/80 hover:bg-background" />
                 </>
               )}
             </Carousel>
@@ -225,7 +230,7 @@ const ViewDetails: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Seller Info */}
+          {/* Seller Info
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -238,18 +243,19 @@ const ViewDetails: React.FC = () => {
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={listing.seller.avatar} />
                   <AvatarFallback>
-                    {listing.seller.name.charAt(0)}
+                    {listing.seller?.name?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className="font-medium">{listing.seller.name}</p>
+                  <p className="font-medium">{listing.seller?.name}</p>
                   <p className="text-sm text-muted-foreground">
-                    {listing.seller.reg_no}
+                    {listing.seller?.reg_no}
                   </p>
                 </div>
               </div>
             </CardContent>
           </Card>
+          */}
 
           {/* Action Buttons */}
           <div className="space-y-3">

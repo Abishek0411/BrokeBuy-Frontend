@@ -175,11 +175,13 @@ const Marketplace: React.FC = () => {
             <Card key={listing.id} className="group hover-card">
               <div className="relative">
                 {listing.images.length > 0 ? (
-                  <img
-                    src={listing.images[0]}
-                    alt={listing.title}
-                    className="w-full h-48 object-cover rounded-t-lg"
-                  />
+                  <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg overflow-hidden">
+                    <img
+                      src={listing.images[0]}
+                      alt={listing.title}
+                      className="max-h-full max-w-full object-contain"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg">
                     <span className="text-muted-foreground">No image</span>
