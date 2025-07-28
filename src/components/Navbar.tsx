@@ -139,6 +139,11 @@ const Navbar: React.FC = () => {
                       My Listings
                     </DropdownMenuItem>
                     
+                    <DropdownMenuItem onClick={() => navigate('/purchases')}>
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      My Purchases
+                    </DropdownMenuItem>
+                    
                     <DropdownMenuItem onClick={() => navigate('/messages')}>
                       <MessageSquare className="h-4 w-4 mr-2" />
                       Messages

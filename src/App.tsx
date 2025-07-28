@@ -12,6 +12,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Marketplace from "./pages/Marketplace";
+import ViewDetails from "./pages/ViewDetails";
+import EditListing from "./pages/EditListing";
+import Purchases from "./pages/Purchases";
 import Profile from "./pages/Profile";
 import Wallet from "./pages/Wallet";
 import Sell from "./pages/Sell";
@@ -59,6 +62,9 @@ const App = () => {
                   <Route path="/auth/login" element={<Login />} />
                   <Route path="/register" element={<Register />} />
                   <Route path="/listings/" element={<Marketplace />} />
+                  <Route path="/listings/:id" element={<ViewDetails />} />
+                  <Route path="/listings/:id/edit" element={<EditListing />} />
+                  <Route path="/purchases" element={<Purchases />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/wallet" element={<Wallet />} />
                   <Route path="/sell" element={<Sell />} />

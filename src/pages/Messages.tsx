@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,9 +40,24 @@ interface Conversation {
 }
 
 const Messages: React.FC = () => {
+  const location = useLocation();
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Check if we should auto-open a conversation with a specific user
+  useEffect(() => {
+    const targetUserId = location.state?.targetUserId;
+    if (targetUserId) {
+      // Find conversation with this user and select it
+      const targetConversation = conversations.find(conv => 
+        conv.other_user.id === targetUserId
+      );
+      if (targetConversation) {
+        setSelectedConversation(targetConversation.id);
+      }
+    }
+  }, [location.state]);
 
   // Mock data
   const conversations: Conversation[] = [

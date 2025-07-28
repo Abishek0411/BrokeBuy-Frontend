@@ -151,7 +151,12 @@ const MyListings: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex-1"
+            onClick={() => window.location.href = `/listings/${listing.id}/edit`}
+          >
             <Edit className="h-3 w-3 mr-1" />
             Edit
           </Button>

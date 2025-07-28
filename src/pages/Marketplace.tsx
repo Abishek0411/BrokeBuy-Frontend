@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,9 +24,11 @@ interface Listing {
   location?: string;
   created_at?: string;
   is_available?: boolean;
+  posted_by?: string;
 }
 
 const Marketplace: React.FC = () => {
+  const navigate = useNavigate();
   const [listings, setListings] = useState<Listing[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -221,10 +224,19 @@ const Marketplace: React.FC = () => {
               
               <CardFooter className="pt-0">
                 <div className="flex gap-2 w-full">
-                  <Button className="flex-1 btn-primary">
+                  <Button 
+                    className="flex-1 btn-primary"
+                    onClick={() => navigate(`/listings/${listing.id}`)}
+                  >
                     View Details
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate('/messages', { 
+                      state: { targetUserId: listing.posted_by } 
+                    })}
+                  >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
                 </div>
