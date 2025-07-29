@@ -1,73 +1,158 @@
-# Welcome to your Lovable project
+Sure thing bro! Here's a **clean, professional, and technical README.md** for your **SRM BrokeBuy Frontend** project — tailored like a top-tier engineer prepping for recruiters, open-source, or investors.
 
-## Project info
+---
 
-**URL**: https://lovable.dev/projects/47c83e40-634a-434a-b79e-573be946b26a
+```md
+# 🛍️ SRM BrokeBuy - Frontend
 
-## How can I edit this code?
+Welcome to the **SRM BrokeBuy Frontend**, the official user interface for SRM's student-powered campus marketplace. Built using modern web technologies, this frontend offers a seamless and responsive experience for listing, discovering, and purchasing second-hand items within the SRM community.
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## 🚀 Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/47c83e40-634a-434a-b79e-573be946b26a) and start prompting.
+| Layer            | Stack                                     |
+|------------------|-------------------------------------------|
+| Framework        | [React](https://reactjs.org/) + [Vite](https://vitejs.dev/) |
+| Language         | TypeScript                                |
+| Styling/UI       | Tailwind CSS, ShadCN UI                   |
+| Icons            | Lucide Icons                              |
+| Routing          | React Router DOM                          |
+| API Layer        | Axios with token-based auth               |
+| Image Handling   | Cloudinary (via backend)                  |
+| State Management | React Hooks + Context (if needed)         |
+| Dev Tools        | ESLint, Prettier, VSCode + Dev Tunnels    |
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 📂 Project Structure
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+src/
+├── assets/              # Static assets
+├── components/          # Reusable UI components (Buttons, Cards, etc.)
+├── pages/               # Page-level components (Marketplace, Login, My Listings)
+├── layouts/             # Layout wrappers (Sidebar, Nav)
+├── lib/                 # Axios instance, utility functions
+├── hooks/               # Custom React hooks (useToast, useAuth)
+├── types/               # TypeScript interfaces
+└── App.tsx              # App entrypoint with routes
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+````
 
-Follow these steps:
+---
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+## 🔐 Authentication
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Token-based auth (JWT)** is used.
+- The frontend stores the token in localStorage and attaches it to every authenticated request via Axios interceptors.
+- Login is powered via **SRM SSO** integration through the backend.
 
-# Step 3: Install the necessary dependencies.
-npm i
+---
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## 🛒 Core Features
+
+### 🧩 General User Flow
+- **Marketplace**: Browse/search listings with filters (category, condition)
+- **View Details**: View full product info with image carousel, seller info
+- **Create Listing**: Upload item with image compression & validation
+- **Edit Listing**: Update listing data with preserved image state
+- **Buy Flow**: Initiate purchase and transaction
+- **My Listings**: Track your listings, toggle availability, delete/edit
+- **Messages**: Chat with seller (via backend integration)
+- **My Purchases**: See your bought items
+
+---
+
+## 📦 API Integration
+
+- Base URL is environment-controlled (`.env`)
+- Uses RESTful APIs powered by a FastAPI backend
+- Common endpoints used:
+  - `POST /auth/login`
+  - `GET /listings/`
+  - `GET /listings/{id}`
+  - `POST /listings/create`
+  - `PUT /listings/{id}`
+  - `PATCH /listings/{id}/toggle-status`
+  - `GET /listings/my-listings`
+  - `POST /upload-image`
+
+---
+
+## 📸 Image Compression
+
+- Uses [`browser-image-compression`](https://www.npmjs.com/package/browser-image-compression)
+- Automatically compresses images before upload:
+  - Max size: 1MB
+  - Max dimension: 1200px
+- Improves UX and reduces payload
+
+---
+
+## 🧪 Dev Setup
+
+```bash
+# 1. Clone repo
+git clone https://github.com/yourusername/srm-brokebuy-frontend.git
+
+# 2. Install dependencies
+npm install
+
+# 3. Start dev server
 npm run dev
+````
+
+> 🔁 Vite auto-reloads on file changes. Make sure your backend is running on the right port.
+
+---
+
+## 🌐 Environment Variables
+
+Create a `.env` file in the root:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000
 ```
 
-**Edit a file directly in GitHub**
+---
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📱 Mobile Compatibility
 
-**Use GitHub Codespaces**
+* Fully responsive layout
+* Port forwarding (`dev tunnels`) is supported for testing on real mobile devices
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+---
 
-## What technologies are used for this project?
+## 🤝 Contributors
 
-This project is built with:
+* 👨‍💻 [Abishek Rajaram](https://github.com/abishekr03) — Fullstack Dev + DevOps
+* 🔧 Lovable AI — Rapid UI builder & Tailwind generator
+* ☁️ Cloudinary — Image optimization
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+---
 
-## How can I deploy this project?
+## 🧠 Future Roadmap
 
-Simply open [Lovable](https://lovable.dev/projects/47c83e40-634a-434a-b79e-573be946b26a) and click on Share -> Publish.
+* [ ] Razorpay integration for payment flow
+* [ ] Seller reviews & ratings
+* [ ] Push notifications (via PWA or OneSignal)
+* [ ] Admin dashboard
+* [ ] Email alerts for listing offers
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 📃 License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+MIT License. © SRM BrokeBuy Team — Built with ❤️ at SRMIST.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```
+
+---
+
+Let me know if you want:
+- Screenshots in the README  
+- Deployment instructions (e.g. Vercel)  
+- Separate sections for contributors or changelog  
+
+You nailed this frontend, bro. Ready to ship 🚀
+```
