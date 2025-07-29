@@ -146,13 +146,3 @@ VITE_API_BASE_URL=http://localhost:8000
 MIT License. © SRM BrokeBuy Team — Built with ❤️ at SRMIST.
 
 ```
-
----
-
-Let me know if you want:
-- Screenshots in the README  
-- Deployment instructions (e.g. Vercel)  
-- Separate sections for contributors or changelog  
-
-You nailed this frontend, bro. Ready to ship 🚀
-```
