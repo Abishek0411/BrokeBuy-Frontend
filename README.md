@@ -1,8 +1,3 @@
-Sure thing bro! Here's a **clean, professional, and technical README.md** for your **SRM BrokeBuy Frontend** project — tailored like a top-tier engineer prepping for recruiters, open-source, or investors.
-
----
-
-```md
 # 🛍️ SRM BrokeBuy - Frontend
 
 Welcome to the **SRM BrokeBuy Frontend**, the official user interface for SRM's student-powered campus marketplace. Built using modern web technologies, this frontend offers a seamless and responsive experience for listing, discovering, and purchasing second-hand items within the SRM community.
