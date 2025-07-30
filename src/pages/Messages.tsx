@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import axios from '@/lib/axios';
 import { 
   MessageSquare, 
   Send, 
@@ -15,19 +17,23 @@ import {
   MoreVertical,
   Phone,
   Video,
-  Paperclip
+  Paperclip,
+  Loader2
 } from 'lucide-react';
 
 interface Message {
-  id: string;
+  id?: string;
   message: string;
   timestamp: string;
   sender_id: string;
-  is_read: boolean;
+  receiver_id: string;
+  listing_id: string;
 }
 
 interface Conversation {
-  id: string;
+  listing_id: string;
+  listing_title: string;
+  listing_image?: string;
   other_user: {
     id: string;
     name: string;
@@ -37,105 +43,142 @@ interface Conversation {
   last_message: string;
   last_message_time: string;
   unread_count: number;
-  messages: Message[];
 }
 
 const Messages: React.FC = () => {
   const location = useLocation();
+  const { listing_id, receiver_id } = useParams<{ listing_id?: string; receiver_id?: string }>();
   const { user } = useAuth();
+  const { toast } = useToast();
   const currentUserId = user?.id;
+  
+  const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [loadingConversations, setLoadingConversations] = useState(true);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Check if we should auto-open a conversation with a specific user
+  // Fetch conversations
+  const fetchConversations = async () => {
+    try {
+      setLoadingConversations(true);
+      const response = await axios.get('/messages/conversations');
+      setConversations(response.data);
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load conversations",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingConversations(false);
+    }
+  };
+
+  // Fetch messages for a specific conversation
+  const fetchMessages = async (listingId: string, receiverId: string) => {
+    try {
+      setLoadingMessages(true);
+      const response = await axios.get(`/messages/chat/${listingId}/${receiverId}`);
+      setMessages(response.data);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load messages",
+        variant: "destructive",
+      });
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  // Send a new message
+  const sendMessage = async () => {
+    if (!newMessage.trim() || !selectedConversation || !currentUserId) return;
+    
+    const selectedConv = conversations.find(c => 
+      `${c.listing_id}-${c.other_user.id}` === selectedConversation
+    );
+    
+    if (!selectedConv) return;
+
+    try {
+      setSendingMessage(true);
+      await axios.post('/messages/send', {
+        receiver_id: selectedConv.other_user.id,
+        listing_id: selectedConv.listing_id,
+        message: newMessage
+      });
+
+      // Add message to local state immediately for better UX
+      const newMsg: Message = {
+        message: newMessage,
+        timestamp: new Date().toISOString(),
+        sender_id: currentUserId,
+        receiver_id: selectedConv.other_user.id,
+        listing_id: selectedConv.listing_id
+      };
+      
+      setMessages(prev => [...prev, newMsg]);
+      setNewMessage('');
+      
+      // Refresh conversations to update last message
+      fetchConversations();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingMessage(false);
+    }
+  };
+
+  // Initial load
+  useEffect(() => {
+    if (currentUserId) {
+      fetchConversations();
+    }
+  }, [currentUserId]);
+
+  // Handle URL params for direct conversation access
+  useEffect(() => {
+    if (listing_id && receiver_id && conversations.length > 0) {
+      const conversationKey = `${listing_id}-${receiver_id}`;
+      setSelectedConversation(conversationKey);
+      fetchMessages(listing_id, receiver_id);
+    }
+  }, [listing_id, receiver_id, conversations]);
+
+  // Handle location state for navigation from marketplace
   useEffect(() => {
     const targetUserId = location.state?.targetUserId;
-    if (targetUserId) {
-      // Find conversation with this user and select it
+    if (targetUserId && conversations.length > 0) {
       const targetConversation = conversations.find(conv => 
         conv.other_user.id === targetUserId
       );
       if (targetConversation) {
-        setSelectedConversation(targetConversation.id);
+        const conversationKey = `${targetConversation.listing_id}-${targetConversation.other_user.id}`;
+        setSelectedConversation(conversationKey);
+        fetchMessages(targetConversation.listing_id, targetConversation.other_user.id);
       }
     }
-  }, [location.state]);
+  }, [location.state, conversations]);
 
-  // Mock data
-  const conversations: Conversation[] = [
-    {
-      id: '1',
-      other_user: {
-        id: '2',
-        name: 'Priya Sharma',
-        avatar: '',
-        reg_no: 'RA2111003010123'
-      },
-      last_message: 'Is the phone still available?',
-      last_message_time: '2024-01-25T10:30:00Z',
-      unread_count: 2,
-      messages: [
-        {
-          id: '1',
-          message: 'Hi! I\'m interested in your iPhone 12.',
-          timestamp: '2024-01-25T10:00:00Z',
-          sender_id: '2',
-          is_read: true
-        },
-        {
-          id: '2',
-          message: 'Hello! Yes, it\'s still available. Would you like to see it?',
-          timestamp: '2024-01-25T10:15:00Z',
-          sender_id: '1',
-          is_read: true
-        },
-        {
-          id: '3',
-          message: 'Is the phone still available?',
-          timestamp: '2024-01-25T10:30:00Z',
-          sender_id: '2',
-          is_read: false
-        }
-      ]
-    },
-    {
-      id: '2',
-      other_user: {
-        id: '3',
-        name: 'Rahul Kumar',
-        avatar: '',
-        reg_no: 'RA2111003010456'
-      },
-      last_message: 'Thanks for the quick delivery!',
-      last_message_time: '2024-01-24T15:45:00Z',
-      unread_count: 0,
-      messages: [
-        {
-          id: '4',
-          message: 'When can I pick up the textbook?',
-          timestamp: '2024-01-24T14:00:00Z',
-          sender_id: '3',
-          is_read: true
-        },
-        {
-          id: '5',
-          message: 'You can pick it up anytime after 3 PM today.',
-          timestamp: '2024-01-24T14:30:00Z',
-          sender_id: '1',
-          is_read: true
-        },
-        {
-          id: '6',
-          message: 'Thanks for the quick delivery!',
-          timestamp: '2024-01-24T15:45:00Z',
-          sender_id: '3',
-          is_read: true
-        }
-      ]
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  ];
+  }, [messages]);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -158,23 +201,18 @@ const Messages: React.FC = () => {
     }
   };
 
-  const selectedConv = conversations.find(c => c.id === selectedConversation);
+  const selectedConv = conversations.find(c => 
+    `${c.listing_id}-${c.other_user.id}` === selectedConversation
+  );
+  
   const filteredConversations = conversations.filter(conv =>
     conv.other_user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Scroll to bottom when messages update
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [selectedConv?.messages]);
-
-  const sendMessage = () => {
-    if (!newMessage.trim() || !selectedConversation) return;
-    
-    // Handle sending message here
-    setNewMessage('');
+  const handleConversationSelect = (conv: Conversation) => {
+    const conversationKey = `${conv.listing_id}-${conv.other_user.id}`;
+    setSelectedConversation(conversationKey);
+    fetchMessages(conv.listing_id, conv.other_user.id);
   };
 
   return (
@@ -204,52 +242,60 @@ const Messages: React.FC = () => {
           </CardHeader>
           <CardContent className="p-0">
             <ScrollArea className="h-[550px]">
-              {filteredConversations.length === 0 ? (
+              {loadingConversations ? (
+                <div className="p-6 text-center">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-3" />
+                  <p className="text-muted-foreground">Loading conversations...</p>
+                </div>
+              ) : filteredConversations.length === 0 ? (
                 <div className="p-6 text-center">
                   <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
                   <p className="text-muted-foreground">No conversations found</p>
                 </div>
               ) : (
-                filteredConversations.map((conversation, index) => (
-                  <div key={conversation.id}>
-                    <div
-                      className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
-                        selectedConversation === conversation.id ? 'bg-muted' : ''
-                      }`}
-                      onClick={() => setSelectedConversation(conversation.id)}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Avatar className="h-10 w-10">
-                          <AvatarImage src={conversation.other_user.avatar} />
-                          <AvatarFallback>
-                            {conversation.other_user.name.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between">
-                            <p className="font-medium truncate">
-                              {conversation.other_user.name}
-                            </p>
-                            <span className="text-xs text-muted-foreground">
-                              {formatTime(conversation.last_message_time)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <p className="text-sm text-muted-foreground truncate">
-                              {conversation.last_message}
-                            </p>
-                            {conversation.unread_count > 0 && (
-                              <Badge variant="default" className="text-xs">
-                                {conversation.unread_count}
-                              </Badge>
-                            )}
+                filteredConversations.map((conversation, index) => {
+                  const conversationKey = `${conversation.listing_id}-${conversation.other_user.id}`;
+                  return (
+                    <div key={conversationKey}>
+                      <div
+                        className={`p-4 cursor-pointer transition-colors hover:bg-muted/50 ${
+                          selectedConversation === conversationKey ? 'bg-muted' : ''
+                        }`}
+                        onClick={() => handleConversationSelect(conversation)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <Avatar className="h-10 w-10">
+                            <AvatarImage src={conversation.other_user.avatar} />
+                            <AvatarFallback>
+                              {conversation.other_user.name.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between">
+                              <p className="font-medium truncate">
+                                {conversation.other_user.name}
+                              </p>
+                              <span className="text-xs text-muted-foreground">
+                                {formatTime(conversation.last_message_time)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm text-muted-foreground truncate">
+                                {conversation.last_message}
+                              </p>
+                              {conversation.unread_count > 0 && (
+                                <Badge variant="default" className="text-xs">
+                                  {conversation.unread_count}
+                                </Badge>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
+                      {index < filteredConversations.length - 1 && <Separator />}
                     </div>
-                    {index < filteredConversations.length - 1 && <Separator />}
-                  </div>
-                ))
+                  );
+                })
               )}
             </ScrollArea>
           </CardContent>
@@ -297,36 +343,42 @@ const Messages: React.FC = () => {
               {/* Messages */}
               <CardContent className="flex-1 p-0">
                 <ScrollArea className="h-[450px] p-4">
-                  <div className="space-y-4">
-                    {selectedConv.messages.map((message) => (
-                      <div
-                        key={message.id}
-                        className={`flex ${
-                          message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
-                        }`}
-                      >
+                  {loadingMessages ? (
+                    <div className="flex items-center justify-center h-full">
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message, index) => (
                         <div
-                          className={`max-w-[70%] p-3 rounded-lg ${
-                            message.sender_id === currentUserId
-                              ? 'bg-primary text-primary-foreground'
-                              : 'bg-muted'
+                          key={message.id || index}
+                          className={`flex ${
+                            message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
                           }`}
                         >
-                          <p className="text-sm">{message.message}</p>
-                          <p
-                            className={`text-xs mt-1 ${
+                          <div
+                            className={`max-w-[70%] p-3 rounded-lg ${
                               message.sender_id === currentUserId
-                                ? 'text-primary-foreground/70'
-                                : 'text-muted-foreground'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted'
                             }`}
                           >
-                            {formatTime(message.timestamp)}
-                          </p>
+                            <p className="text-sm">{message.message}</p>
+                            <p
+                              className={`text-xs mt-1 ${
+                                message.sender_id === currentUserId
+                                  ? 'text-primary-foreground/70'
+                                  : 'text-muted-foreground'
+                              }`}
+                            >
+                              {formatTime(message.timestamp)}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    ))}
-                    <div ref={messagesEndRef} />
-                  </div>
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
                 </ScrollArea>
               </CardContent>
 
@@ -345,10 +397,14 @@ const Messages: React.FC = () => {
                   />
                   <Button 
                     onClick={sendMessage}
-                    disabled={!newMessage.trim()}
+                    disabled={!newMessage.trim() || sendingMessage}
                     className="btn-primary"
                   >
-                    <Send className="h-4 w-4" />
+                    {sendingMessage ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Send className="h-4 w-4" />
+                    )}
                   </Button>
                 </div>
               </div>
