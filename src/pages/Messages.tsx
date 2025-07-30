@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,7 +20,7 @@ import {
 
 interface Message {
   id: string;
-  content: string;
+  message: string;
   timestamp: string;
   sender_id: string;
   is_read: boolean;
@@ -42,9 +42,12 @@ interface Conversation {
 
 const Messages: React.FC = () => {
   const location = useLocation();
+  const { user } = useAuth();
+  const currentUserId = user?.id;
   const [selectedConversation, setSelectedConversation] = useState<string | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Check if we should auto-open a conversation with a specific user
   useEffect(() => {
@@ -76,21 +79,21 @@ const Messages: React.FC = () => {
       messages: [
         {
           id: '1',
-          content: 'Hi! I\'m interested in your iPhone 12.',
+          message: 'Hi! I\'m interested in your iPhone 12.',
           timestamp: '2024-01-25T10:00:00Z',
           sender_id: '2',
           is_read: true
         },
         {
           id: '2',
-          content: 'Hello! Yes, it\'s still available. Would you like to see it?',
+          message: 'Hello! Yes, it\'s still available. Would you like to see it?',
           timestamp: '2024-01-25T10:15:00Z',
           sender_id: '1',
           is_read: true
         },
         {
           id: '3',
-          content: 'Is the phone still available?',
+          message: 'Is the phone still available?',
           timestamp: '2024-01-25T10:30:00Z',
           sender_id: '2',
           is_read: false
@@ -111,21 +114,21 @@ const Messages: React.FC = () => {
       messages: [
         {
           id: '4',
-          content: 'When can I pick up the textbook?',
+          message: 'When can I pick up the textbook?',
           timestamp: '2024-01-24T14:00:00Z',
           sender_id: '3',
           is_read: true
         },
         {
           id: '5',
-          content: 'You can pick it up anytime after 3 PM today.',
+          message: 'You can pick it up anytime after 3 PM today.',
           timestamp: '2024-01-24T14:30:00Z',
           sender_id: '1',
           is_read: true
         },
         {
           id: '6',
-          content: 'Thanks for the quick delivery!',
+          message: 'Thanks for the quick delivery!',
           timestamp: '2024-01-24T15:45:00Z',
           sender_id: '3',
           is_read: true
@@ -159,6 +162,13 @@ const Messages: React.FC = () => {
   const filteredConversations = conversations.filter(conv =>
     conv.other_user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  // Scroll to bottom when messages update
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [selectedConv?.messages]);
 
   const sendMessage = () => {
     if (!newMessage.trim() || !selectedConversation) return;
@@ -292,20 +302,20 @@ const Messages: React.FC = () => {
                       <div
                         key={message.id}
                         className={`flex ${
-                          message.sender_id === '1' ? 'justify-end' : 'justify-start'
+                          message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
                         }`}
                       >
                         <div
                           className={`max-w-[70%] p-3 rounded-lg ${
-                            message.sender_id === '1'
+                            message.sender_id === currentUserId
                               ? 'bg-primary text-primary-foreground'
                               : 'bg-muted'
                           }`}
                         >
-                          <p className="text-sm">{message.content}</p>
+                          <p className="text-sm">{message.message}</p>
                           <p
                             className={`text-xs mt-1 ${
-                              message.sender_id === '1'
+                              message.sender_id === currentUserId
                                 ? 'text-primary-foreground/70'
                                 : 'text-muted-foreground'
                             }`}
@@ -315,6 +325,7 @@ const Messages: React.FC = () => {
                         </div>
                       </div>
                     ))}
+                    <div ref={messagesEndRef} />
                   </div>
                 </ScrollArea>
               </CardContent>
