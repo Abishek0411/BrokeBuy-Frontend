@@ -63,7 +63,7 @@ const ViewDetails: React.FC = () => {
     
     setIsBuying(true);
     try {
-      await api.post(`/buy/${listing.id}`);
+      await api.post(`/listings/buy/${listing.id}`);
       toast({
         title: "Purchase Successful!",
         description: "Your purchase has been processed successfully",

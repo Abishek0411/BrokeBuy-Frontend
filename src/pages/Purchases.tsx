@@ -14,13 +14,11 @@ interface Purchase {
   category: string;
   condition: string;
   images: string[];
-  seller: {
-    name: string;
-    reg_no: string;
-  };
+  seller_name: string;
+  seller_reg_no: string;
   location: string;
-  purchased_at: string;
-  status: string;
+  created_at: string;
+  is_available: boolean;
 }
 
 const Purchases: React.FC = () => {
@@ -63,19 +61,6 @@ const Purchases: React.FC = () => {
     });
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return <Badge variant="default">Completed</Badge>;
-      case 'pending':
-        return <Badge variant="secondary">Pending</Badge>;
-      case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
   const PurchaseCard = ({ purchase }: { purchase: Purchase }) => (
     <Card className="group hover-card">
       <div className="relative">
@@ -91,7 +76,9 @@ const Purchases: React.FC = () => {
           </div>
         )}
         <div className="absolute top-2 right-2">
-          {getStatusBadge(purchase.status)}
+          <Badge variant={purchase.is_available ? "secondary" : "default"}>
+            {purchase.is_available ? "Available" : "Sold"}
+          </Badge>
         </div>
       </div>
       
@@ -111,8 +98,8 @@ const Purchases: React.FC = () => {
         </CardDescription>
         
         <div className="space-y-2 text-sm text-muted-foreground mb-4">
-          <div>Purchased on {formatDate(purchase.purchased_at)}</div>
-          <div>Sold by {purchase.seller.name} ({purchase.seller.reg_no})</div>
+          <div>Purchased on {formatDate(purchase.created_at)}</div>
+          <div>Sold by {purchase.seller_name} ({purchase.seller_reg_no})</div>
           <div>Condition: {purchase.condition}</div>
         </div>
         
