@@ -232,10 +232,11 @@ const Marketplace: React.FC = () => {
                   >
                     View Details
                   </Button>
+
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate('/messages', { 
+                    onClick={() => navigate(`/messages/${listing.id}/${listing.posted_by}`, { 
                       state: { targetUserId: listing.posted_by } 
                     })}
                   >
@@ -243,6 +244,7 @@ const Marketplace: React.FC = () => {
                   </Button>
                 </div>
               </CardFooter>
+
             </Card>
           ))}
         </div>
