@@ -236,9 +236,8 @@ const Marketplace: React.FC = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => navigate(`/messages/${listing.id}/${listing.posted_by}`, { 
-                      state: { targetUserId: listing.posted_by } 
-                    })}
+                    onClick={() => navigate(`/messages/${listing.id}/${listing.posted_by}`)}
+                    title="Message seller"
                   >
                     <MessageCircle className="h-4 w-4" />
                   </Button>
