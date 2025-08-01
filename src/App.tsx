@@ -69,6 +69,7 @@ const App = () => {
                   <Route path="/wallet" element={<Wallet />} />
                   <Route path="/sell" element={<Sell />} />
                   <Route path="/listings/my-listings" element={<MyListings />} />
+                  <Route path="/messages/:listing_id/:receiver_id" element={<Messages />} />
                   <Route path="/messages" element={<Messages />} />
                   <Route path="/how-it-works" element={<HowItWorks />} />
                   <Route path="/safety" element={<SafetyGuidelines />} />

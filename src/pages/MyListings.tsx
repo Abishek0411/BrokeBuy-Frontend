@@ -166,6 +166,7 @@ const MyListings: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => toggleListingStatus(listing.id, listing.is_available)}
+            title={listing.is_available ? "Make it Inactive" : "Make it Available"}
           >
             {listing.is_available ? (
               <EyeOff className="h-3 w-3" />
@@ -177,6 +178,7 @@ const MyListings: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => deleteListing(listing.id)}
+            title="Delete listing"
             className="text-destructive hover:text-destructive"
           >
             <Trash2 className="h-3 w-3" />

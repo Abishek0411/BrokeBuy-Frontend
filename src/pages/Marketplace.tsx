@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, Filter, Heart, MessageCircle, MapPin, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 
 interface Listing {
@@ -35,6 +36,8 @@ const Marketplace: React.FC = () => {
   const [selectedCondition, setSelectedCondition] = useState('all');
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const currentUserId = user?.id;
 
   const categories = [
     'Electronics', 'Books', 'Clothing', 'Sports', 'Furniture', 
@@ -171,82 +174,88 @@ const Marketplace: React.FC = () => {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredListings.map((listing) => (
-            <Card key={listing.id} className="group hover-card">
-              <div className="relative">
-                {listing.images.length > 0 ? (
-                  <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg overflow-hidden">
-                    <img
-                      src={listing.images[0]}
-                      alt={listing.title}
-                      className="max-h-full max-w-full object-contain"
-                    />
+          {filteredListings.map((listing) => {
+              const isOwnListing = currentUserId === listing.posted_by;
+              return(
+                <Card key={listing.id} className="group hover-card">
+                  <div className="relative">
+                    {listing.images.length > 0 ? (
+                      <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg overflow-hidden">
+                        <img
+                          src={listing.images[0]}
+                          alt={listing.title}
+                          className="max-h-full max-w-full object-contain"
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg">
+                        <span className="text-muted-foreground">No image</span>
+                      </div>
+                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm"
+                    >
+                      <Heart className="h-4 w-4" />
+                    </Button>
                   </div>
-                ) : (
-                  <div className="w-full h-48 bg-muted flex items-center justify-center rounded-t-lg">
-                    <span className="text-muted-foreground">No image</span>
-                  </div>
-                )}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm"
-                >
-                  <Heart className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <CardHeader className="pb-2">
-                <div className="flex justify-between items-start">
-                  <CardTitle className="text-lg line-clamp-1">{listing.title}</CardTitle>
-                  <Badge variant="secondary">{listing.condition}</Badge>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-3 w-3" />
-                  {listing.location}
-                  <Clock className="h-3 w-3 ml-2" />
-                  {formatDate(listing.created_at)}
-                </div>
-              </CardHeader>
-              
-              <CardContent>
-                <CardDescription className="line-clamp-2 mb-3">
-                  {listing.description}
-                </CardDescription>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-primary">
-                    {formatCurrency(listing.price)}
-                  </span>
-                  <Badge variant="outline">{listing.category}</Badge>
-                </div>
-                <div className="mt-2 text-sm text-muted-foreground">
-                  Sold by {listing.seller?.name || 'Unknown'} ({listing.seller?.reg_no || 'N/A'})
-                </div>
-              </CardContent>
-              
-              <CardFooter className="pt-0">
-                <div className="flex gap-2 w-full">
-                  <Button 
-                    className="flex-1 btn-primary"
-                    onClick={() => navigate(`/listings/${listing.id}`)}
-                  >
-                    View Details
-                  </Button>
-
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => navigate(`/messages/${listing.id}/${listing.posted_by}`)}
-                    title="Message seller"
-                  >
-                    <MessageCircle className="h-4 w-4" />
-                  </Button>
-                </div>
-              </CardFooter>
-
-            </Card>
-          ))}
-        </div>
+                  
+                  <CardHeader className="pb-2">
+                    <div className="flex justify-between items-start">
+                      <CardTitle className="text-lg line-clamp-1">{listing.title}</CardTitle>
+                      <Badge variant="secondary">{listing.condition}</Badge>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3" />
+                      {listing.location}
+                      <Clock className="h-3 w-3 ml-2" />
+                      {formatDate(listing.created_at)}
+                    </div>
+                  </CardHeader>
+                  
+                  <CardContent>
+                    <CardDescription className="line-clamp-2 mb-3">
+                      {listing.description}
+                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                      <span className="text-2xl font-bold text-primary">
+                        {formatCurrency(listing.price)}
+                      </span>
+                      <Badge variant="outline">{listing.category}</Badge>
+                    </div>
+                    <div className="mt-2 text-sm text-muted-foreground">
+                      Sold by {listing.seller?.name || 'Unknown'} ({listing.seller?.reg_no || 'N/A'})
+                    </div>
+                  </CardContent>
+                  
+                  <CardFooter className="pt-0">
+                    <div className="flex gap-2 w-full">
+                      <Button 
+                        className="flex-1 btn-primary"
+                        onClick={() => navigate(`/listings/${listing.id}`)}
+                      >
+                        View Details
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        disabled={isOwnListing}
+                        title={isOwnListing ? "You cannot message yourself" : "Message seller"}
+                        onClick={() => {
+                          if (!isOwnListing) {
+                            navigate(`/messages/${listing.id}/${listing.posted_by}`);
+                          }
+                        }}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
       )}
     </div>
   );

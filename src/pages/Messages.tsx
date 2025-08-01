@@ -61,6 +61,7 @@ const Messages: React.FC = () => {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sendingMessage, setSendingMessage] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [activeChatPartner, setActiveChatPartner] = useState(null);
 
   // Fetch conversations
   const fetchConversations = async () => {
@@ -84,19 +85,17 @@ const Messages: React.FC = () => {
   const fetchMessages = async (listingId: string, receiverId: string) => {
     try {
       setLoadingMessages(true);
+      // The API now returns an object with 'messages' and 'other_user'
       const response = await axios.get(`/messages/chat/${listingId}/${receiverId}`);
-      setMessages(response.data);
+      setMessages(response.data.messages);
+      setActiveChatPartner(response.data.other_user); // Set the chat partner state
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load messages",
-        variant: "destructive",
-      });
+      // ... error handling
     } finally {
       setLoadingMessages(false);
     }
   };
+
 
   // Send a new message
   const sendMessage = async () => {
@@ -151,12 +150,12 @@ const Messages: React.FC = () => {
 
   // Handle URL params for direct conversation access
   useEffect(() => {
-    if (listing_id && receiver_id && conversations.length > 0) {
+    if (listing_id && receiver_id) {
       const conversationKey = `${listing_id}-${receiver_id}`;
-      setSelectedConversation(conversationKey);
-      fetchMessages(listing_id, receiver_id);
+      setSelectedConversation(conversationKey); // Set the ID for highlighting
+      fetchMessages(listing_id, receiver_id); // Fetch chat data directly
     }
-  }, [listing_id, receiver_id, conversations]);
+  }, [listing_id, receiver_id]);
 
   // Handle location state for navigation from marketplace
   useEffect(() => {
@@ -215,7 +214,7 @@ const Messages: React.FC = () => {
     fetchMessages(conv.listing_id, conv.other_user.id);
   };
 
-  return (
+return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold gradient-text mb-2">Messages</h1>
@@ -223,7 +222,7 @@ const Messages: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[700px]">
-        {/* Conversations List */}
+        {/* Conversations List (No changes needed here) */}
         <Card className="lg:col-span-1">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
@@ -267,7 +266,7 @@ const Messages: React.FC = () => {
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={conversation.other_user.avatar} />
                             <AvatarFallback>
-                              {conversation.other_user.name.charAt(0)}
+                              {conversation.other_user.name?.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
                           <div className="flex-1 min-w-0">
@@ -301,98 +300,89 @@ const Messages: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Chat Area */}
+        {/* --- REFACTORED CHAT AREA --- */}
         <Card className="lg:col-span-2">
-          {selectedConv ? (
+          {/* 1. Main condition now checks for loading state or the active chat partner */}
+          {loadingMessages ? (
+            <div className="flex items-center justify-center h-full">
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : activeChatPartner ? (
             <div className="flex flex-col h-full">
-              {/* Chat Header */}
+              {/* 2. Chat header now uses `activeChatPartner` for its data */}
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={selectedConv.other_user.avatar} />
+                      <AvatarImage src={activeChatPartner.avatar} />
                       <AvatarFallback>
-                        {selectedConv.other_user.name.charAt(0)}
+                        {activeChatPartner.name?.charAt(0)}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <CardTitle className="text-lg">
-                        {selectedConv.other_user.name}
+                        {activeChatPartner.name}
                       </CardTitle>
                       <CardDescription>
-                        {selectedConv.other_user.reg_no}
+                        {activeChatPartner.reg_no}
                       </CardDescription>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm">
-                      <Phone className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Video className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
+                    <Button variant="ghost" size="icon"><Phone className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon"><Video className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon"><MoreVertical className="h-4 w-4" /></Button>
                   </div>
                 </div>
               </CardHeader>
               
               <Separator />
 
-              {/* Messages */}
+              {/* Messages section remains the same, as it already uses `messages` state */}
               <CardContent className="flex-1 p-0">
                 <ScrollArea className="h-[450px] p-4">
-                  {loadingMessages ? (
-                    <div className="flex items-center justify-center h-full">
-                      <Loader2 className="h-6 w-6 animate-spin" />
-                    </div>
-                  ) : (
-                    <div className="space-y-4">
-                      {messages.map((message, index) => (
+                  <div className="space-y-4">
+                    {messages.map((message, index) => (
+                      <div
+                        key={message.id || index}
+                        className={`flex ${
+                          message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
+                        }`}
+                      >
                         <div
-                          key={message.id || index}
-                          className={`flex ${
-                            message.sender_id === currentUserId ? 'justify-end' : 'justify-start'
+                          className={`max-w-[70%] p-3 rounded-lg ${
+                            message.sender_id === currentUserId
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-muted'
                           }`}
                         >
-                          <div
-                            className={`max-w-[70%] p-3 rounded-lg ${
+                          <p className="text-sm">{message.message}</p>
+                          <p
+                            className={`text-xs mt-1 text-right ${
                               message.sender_id === currentUserId
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted'
+                                ? 'text-primary-foreground/70'
+                                : 'text-muted-foreground'
                             }`}
                           >
-                            <p className="text-sm">{message.message}</p>
-                            <p
-                              className={`text-xs mt-1 ${
-                                message.sender_id === currentUserId
-                                  ? 'text-primary-foreground/70'
-                                  : 'text-muted-foreground'
-                              }`}
-                            >
-                              {formatTime(message.timestamp)}
-                            </p>
-                          </div>
+                            {formatTime(message.timestamp)}
+                          </p>
                         </div>
-                      ))}
-                      <div ref={messagesEndRef} />
-                    </div>
-                  )}
+                      </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
                 </ScrollArea>
               </CardContent>
 
-              {/* Message Input */}
+              {/* Message Input section also remains the same */}
               <div className="p-4 border-t">
                 <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Paperclip className="h-4 w-4" />
-                  </Button>
+                  <Button variant="ghost" size="icon"><Paperclip className="h-4 w-4" /></Button>
                   <Input
                     placeholder="Type a message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                    onKeyPress={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
                     className="flex-1"
                   />
                   <Button 
@@ -410,12 +400,13 @@ const Messages: React.FC = () => {
               </div>
             </div>
           ) : (
+            // This is the default placeholder when no chat is active
             <CardContent className="flex items-center justify-center h-full">
               <div className="text-center">
                 <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">No conversation selected</h3>
+                <h3 className="text-lg font-semibold mb-2">Select a conversation</h3>
                 <p className="text-muted-foreground">
-                  Choose a conversation to start messaging
+                  Choose a chat from the left to start messaging.
                 </p>
               </div>
             </CardContent>
@@ -424,6 +415,5 @@ const Messages: React.FC = () => {
       </div>
     </div>
   );
-};
-
+}
 export default Messages;
