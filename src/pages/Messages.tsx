@@ -100,35 +100,34 @@ const Messages: React.FC = () => {
   // Send a new message
   const sendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation || !currentUserId) return;
-    
+
     const selectedConv = conversations.find(c => 
       `${c.listing_id}-${c.other_user.id}` === selectedConversation
     );
-    
+
     if (!selectedConv) return;
 
     try {
       setSendingMessage(true);
+
       await axios.post('/messages/send', {
         receiver_id: selectedConv.other_user.id,
         listing_id: selectedConv.listing_id,
         message: newMessage
       });
 
-      // Add message to local state immediately for better UX
       const newMsg: Message = {
+        id: `temp-${Date.now()}`, // optional for unique key
         message: newMessage,
         timestamp: new Date().toISOString(),
         sender_id: currentUserId,
         receiver_id: selectedConv.other_user.id,
         listing_id: selectedConv.listing_id
       };
-      
+
       setMessages(prev => [...prev, newMsg]);
       setNewMessage('');
-      
-      // Refresh conversations to update last message
-      fetchConversations();
+      fetchConversations(); // Refresh sidebar with latest
     } catch (error) {
       console.error('Error sending message:', error);
       toast({
@@ -140,7 +139,6 @@ const Messages: React.FC = () => {
       setSendingMessage(false);
     }
   };
-
   // Initial load
   useEffect(() => {
     if (currentUserId) {

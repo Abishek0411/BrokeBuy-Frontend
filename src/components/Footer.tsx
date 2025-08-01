@@ -100,7 +100,7 @@ const Footer: React.FC = () => {
           </div>
           
           <div className="text-center text-sm text-muted-foreground mt-4">
-            <p>&copy; 2024 SRM BrokeBuy. All rights reserved.</p>
+            <p>&copy; 2025 SRM BrokeBuy. All rights reserved.</p>
           </div>
         </div>
       </div>

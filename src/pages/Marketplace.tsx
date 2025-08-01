@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Filter, Heart, MessageCircle, MapPin, Clock } from 'lucide-react';
+import { Search, Filter, Heart, MessageSquareMore, MapPin, Clock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
@@ -152,7 +152,7 @@ const Marketplace: React.FC = () => {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="outline" className="flex items-center gap-2" title="Yet to be implemented">
           <Filter className="h-4 w-4" />
           Filter
         </Button>
@@ -248,7 +248,7 @@ const Marketplace: React.FC = () => {
                           }
                         }}
                       >
-                        <MessageCircle className="h-4 w-4" />
+                        <MessageSquareMore className="h-4 w-4" />
                       </Button>
                     </div>
                   </CardFooter>

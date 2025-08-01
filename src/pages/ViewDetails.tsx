@@ -3,10 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuth } from '@/context/AuthContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, MapPin, Clock, User, ShoppingCart, MessageCircle, Heart } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, User, ShoppingCart, MessageCircle, Heart, MessageSquareMore } from 'lucide-react';
 import api from '@/lib/axios';
 
 interface Listing {
@@ -17,11 +17,9 @@ interface Listing {
   category: string;
   condition: string;
   images: string[];
-  seller: {
-    name: string;
-    reg_no: string;
-    avatar?: string;
-  };
+  seller_name?: string
+  seller_reg_no?: string;
+  seller_avatar?:  string;
   location: string;
   created_at: string;
   is_available: boolean;
@@ -35,6 +33,9 @@ const ViewDetails: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isBuying, setIsBuying] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const currentUserId = user?.id;
+
 
   useEffect(() => {
     if (id) {
@@ -78,14 +79,6 @@ const ViewDetails: React.FC = () => {
     } finally {
       setIsBuying(false);
     }
-  };
-
-  const handleMessageSeller = () => {
-    if (!listing) return;
-    
-    navigate('/messages', { 
-      state: { targetUserId: listing.posted_by } 
-    });
   };
 
   const formatCurrency = (amount: number) => {
@@ -133,6 +126,8 @@ const ViewDetails: React.FC = () => {
       </div>
     );
   }
+
+  const isOwnListing = currentUserId === listing?.posted_by;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -230,7 +225,7 @@ const ViewDetails: React.FC = () => {
             </CardContent>
           </Card>
 
-          {/* Seller Info
+          {/* Seller Info */}
           <Card>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
@@ -239,23 +234,13 @@ const ViewDetails: React.FC = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-3">
-                <Avatar className="h-12 w-12">
-                  <AvatarImage src={listing.seller.avatar} />
-                  <AvatarFallback>
-                    {listing.seller?.name?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <p className="font-medium">{listing.seller?.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {listing.seller?.reg_no}
-                  </p>
-                </div>
+              <div>
+                <p className="font-medium">{listing.seller_name}</p>
+                <p className="text-sm text-muted-foreground">{listing.seller_reg_no}</p>
               </div>
             </CardContent>
           </Card>
-          */}
+
 
           {/* Action Buttons */}
           <div className="space-y-3">
@@ -269,14 +254,25 @@ const ViewDetails: React.FC = () => {
             </Button>
             
             <div className="grid grid-cols-2 gap-3">
+              {/* This is the refactored Message Seller button */}
               <Button 
                 variant="outline" 
-                onClick={handleMessageSeller}
                 className="flex-1"
+                // The button is disabled if it's the user's own listing
+                disabled={isOwnListing}
+                // The tooltip changes to explain why it's disabled
+                title={isOwnListing ? "You cannot message yourself" : "Message seller"}
+                onClick={() => {
+                  // This logic now navigates to the URL with parameters
+                  if (!isOwnListing && listing) {
+                    navigate(`/messages/${listing.id}/${listing.posted_by}`);
+                  }
+                }}
               >
-                <MessageCircle className="h-4 w-4 mr-2" />
+                <MessageSquareMore className="h-4 w-4 mr-2" />
                 Message Seller
               </Button>
+
               <Button variant="outline" className="flex-1">
                 <Heart className="h-4 w-4 mr-2" />
                 Save

@@ -5,11 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Package, ShoppingBag, MessageCircle, Star } from 'lucide-react';
 import api from '@/lib/axios';
+import { useNavigate } from 'react-router-dom';
 
 interface Purchase {
   id: string;
   title: string;
   description: string;
+  posted_by: string;
   price: number;
   category: string;
   condition: string;
@@ -22,6 +24,7 @@ interface Purchase {
 }
 
 const Purchases: React.FC = () => {
+  const navigate = useNavigate();
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
@@ -104,7 +107,8 @@ const Purchases: React.FC = () => {
         </div>
         
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex-1">
+          <Button variant="outline" size="sm" className="flex-1"
+            onClick={() => navigate(`/messages/${purchase.id}/${purchase.posted_by}`)}>
             <MessageCircle className="h-3 w-3 mr-1" />
             Contact Seller
           </Button>

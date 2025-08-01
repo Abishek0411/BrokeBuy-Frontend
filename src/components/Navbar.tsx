@@ -49,13 +49,13 @@ const Navbar: React.FC = () => {
     <>
       <Link to="/listings/" className="btn-ghost">
         <Search className="h-4 w-4 mr-2" />
-        {!isMobile && "Browse"}
+        {!isMobile && "Browse"}   {/* Try removing this !isMobile if you want to keep the browse icon with text in mobile*/}
       </Link>
       
       {isAuthenticated && (
         <Link to="/sell" className="btn-ghost">
           <Plus className="h-4 w-4 mr-2" />
-          {!isMobile && "Sell"}
+          {!isMobile && "Sell"}   {/* Try removing this !isMobile if you want to keep the sell icon with text in mobile*/}
         </Link>
       )}
     </>
