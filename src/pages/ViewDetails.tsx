@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/context/AuthContext';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { useToast } from '@/hooks/use-toast';
+import BuyNowConfirmationModal from '@/components/BuyNowConfirmationModal';
 import { ArrowLeft, MapPin, Clock, User, ShoppingCart, MessageCircle, Heart, MessageSquareMore } from 'lucide-react';
 import api from '@/lib/axios';
 
@@ -32,6 +33,7 @@ const ViewDetails: React.FC = () => {
   const [listing, setListing] = useState<Listing | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isBuying, setIsBuying] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const currentUserId = user?.id;
@@ -59,10 +61,15 @@ const ViewDetails: React.FC = () => {
     }
   };
 
-  const handleBuyNow = async () => {
+  const handleBuyNowClick = () => {
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmPurchase = async () => {
     if (!listing) return;
     
     setIsBuying(true);
+    setShowConfirmation(false);
     try {
       await api.post(`/listings/buy/${listing.id}`);
       toast({
@@ -79,6 +86,10 @@ const ViewDetails: React.FC = () => {
     } finally {
       setIsBuying(false);
     }
+  };
+
+  const handleCancelPurchase = () => {
+    setShowConfirmation(false);
   };
 
   const formatCurrency = (amount: number) => {
@@ -246,7 +257,7 @@ const ViewDetails: React.FC = () => {
           <div className="space-y-3">
             <Button 
               className="w-full btn-primary"
-              onClick={handleBuyNow}
+              onClick={handleBuyNowClick}
               disabled={!listing.is_available || isBuying}
             >
               <ShoppingCart className="h-4 w-4 mr-2" />
@@ -281,6 +292,14 @@ const ViewDetails: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Buy Now Confirmation Modal */}
+      <BuyNowConfirmationModal
+        isOpen={showConfirmation}
+        onConfirm={handleConfirmPurchase}
+        onCancel={handleCancelPurchase}
+        isLoading={isBuying}
+      />
     </div>
   );
 };

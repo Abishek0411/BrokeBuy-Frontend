@@ -101,7 +101,7 @@ const Navbar: React.FC = () => {
                           src={user?.avatar}
                           alt={user?.name}
                         />
-                        <AvatarFallback>
+                        <AvatarFallback className="bg-accent-beige text-primary">
                           {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                         </AvatarFallback>
                       </Avatar>

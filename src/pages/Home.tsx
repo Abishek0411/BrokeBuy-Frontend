@@ -6,6 +6,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import OnboardingPopup from '@/components/OnboardingPopup';
 import {
   ShoppingCart,
   Shield,
@@ -21,9 +22,10 @@ import heroBackground from '@/assets/hero-bg.png';
 import { useToast } from '@/hooks/use-toast';
 
 const Home: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   const features = [
     {
@@ -76,6 +78,16 @@ useEffect(() => {
   fetchRecentListings();
 }, []);
 
+// Check if onboarding should be shown after user login
+useEffect(() => {
+  if (isAuthenticated && user) {
+    const shouldShowOnboarding = localStorage.getItem('showOnboarding') !== 'false';
+    if (shouldShowOnboarding) {
+      setShowOnboarding(true);
+    }
+  }
+}, [isAuthenticated, user]);
+
 const fetchRecentListings = async () => {
   try {
     const response = await api.get<Listing[]>('/listings/recent');
@@ -92,6 +104,11 @@ const fetchRecentListings = async () => {
 
   return (
     <div className="min-h-screen">
+      {/* Onboarding Popup */}
+      <OnboardingPopup 
+        isOpen={showOnboarding} 
+        onClose={() => setShowOnboarding(false)} 
+      />
       {/* Hero Section */}
       <section 
         className="relative py-20 lg:py-32 bg-gradient-hero"
