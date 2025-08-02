@@ -30,14 +30,6 @@ const OnboardingPopup: React.FC<OnboardingPopupProps> = ({ isOpen, onClose }) =>
               </div>
               <DialogTitle className="text-xl font-bold">Welcome to SRM BrokeBuy!</DialogTitle>
             </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="h-6 w-6 p-0"
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </div>
         </DialogHeader>
         

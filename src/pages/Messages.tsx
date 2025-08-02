@@ -117,7 +117,7 @@ const Messages: React.FC = () => {
       });
 
       const newMsg: Message = {
-        id: `temp-${Date.now()}`, // optional for unique key
+        id: `temp-${Date.now()}`, // This is still good UX for local updates
         message: newMessage,
         timestamp: new Date().toISOString(),
         sender_id: currentUserId,
@@ -127,9 +127,8 @@ const Messages: React.FC = () => {
 
       setMessages(prev => [...prev, newMsg]);
       setNewMessage('');
-      fetchConversations(); // Refresh sidebar with latest
+      fetchConversations(); // Keep this to update sidebar
     } catch (error) {
-      console.error('Error sending message:', error);
       toast({
         title: "Error",
         description: "Failed to send message",
@@ -139,6 +138,8 @@ const Messages: React.FC = () => {
       setSendingMessage(false);
     }
   };
+
+
   // Initial load
   useEffect(() => {
     if (currentUserId) {

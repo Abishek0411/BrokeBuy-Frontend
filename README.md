@@ -2,6 +2,7 @@
 
 Welcome to the **SRM BrokeBuy Frontend**, the official user interface for SRM's student-powered campus marketplace. Built using modern web technologies, this frontend offers a seamless and responsive experience for listing, discovering, and purchasing second-hand items within the SRM community.
 
+Link to the backend repo: https://github.com/Abishek0411/BrokeBuy
 ---
 
 ## 🚀 Tech Stack
